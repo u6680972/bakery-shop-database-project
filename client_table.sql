@@ -1,0 +1,5 @@
+CREATE TABLE client (
+    shop_id SERIAL PRIMARY KEY,
+    owner_id INT UNIQUE NOT NULL REFERENCES "user"(user_id) ON DELETE RESTRICT,
+    shop_name VARCHAR(100) UNIQUE NOT NULL
+);
