@@ -19,8 +19,8 @@ BEGIN
     WHERE shop_name = p_shop_identifier
     LIMIT 1;
 
-    INSERT INTO "user" (username, password_hash, email, first_name, last_name, user_type)
-    VALUES (p_email, p_password, p_email, p_first_name, p_last_name, 'customer')
+    INSERT INTO "user" (username, password_hash, email, first_name, last_name)
+    VALUES (p_email, p_password, p_email, p_first_name, p_last_name)
     RETURNING user_id INTO v_new_user_id;
 
     INSERT INTO shop_customer (shop_id, first_name, last_name, email, password_hash)

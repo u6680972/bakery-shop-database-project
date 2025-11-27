@@ -13,3 +13,5 @@ ALTER TABLE "user" ALTER COLUMN last_name SET NOT NULL;
 ALTER TABLE "user" ADD COLUMN user_type VARCHAR(20) DEFAULT 'manager';
 ALTER TABLE "user" ALTER COLUMN user_type SET NOT NULL;
 ALTER TABLE "user" ADD CONSTRAINT check_valid_user_type CHECK (user_type IN ('manager', 'customer'));
+
+ALTER TABLE "user" DROP COLUMN user_type;
