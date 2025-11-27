@@ -11,9 +11,8 @@ BEGIN
     WHERE invitation_code = p_invitation_code
         FOR UPDATE;
 
-
-    INSERT INTO "user" (username, password_hash, email, first_name, last_name)
-    VALUES (p_username, p_password, p_email, p_first_name, p_last_name)
+    INSERT INTO "user" (username, password_hash, email, first_name, last_name, user_type)
+    VALUES (p_username, p_password, p_email, p_first_name, p_last_name, 'manager')
     RETURNING user_id INTO v_new_user_id;
 
     INSERT INTO shop_manager_access (manager_user_id, shop_id)
