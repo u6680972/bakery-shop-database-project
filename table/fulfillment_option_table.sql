@@ -1,13 +1,18 @@
-CREATE TABLE fulfillment_option (
-    option_id SERIAL PRIMARY KEY,
-    shop_id INT NOT NULL,
-    type TEXT NOT NULL,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+create table fulfillment_option
+(
+    option_id serial
+        primary key,
+    shop_id   integer              not null
+        constraint fk_shop
+            references client
+            on delete cascade,
+    type      text                 not null,
+    is_active boolean default true not null,
+    constraint uq_shop_type
+        unique (shop_id, type)
+)
+    using ???;
 
-    CONSTRAINT fk_shop
-        FOREIGN KEY(shop_id)
-            REFERENCES client(shop_id)
-            ON DELETE CASCADE,
+alter table fulfillment_option
+    owner to root;
 
-    CONSTRAINT uq_shop_type UNIQUE (shop_id, type)
-);

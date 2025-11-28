@@ -1,5 +1,18 @@
-CREATE TABLE client (
-    shop_id SERIAL PRIMARY KEY,
-    owner_id INT UNIQUE NOT NULL REFERENCES "user"(user_id) ON DELETE RESTRICT,
-    shop_name VARCHAR(100) UNIQUE NOT NULL
-);
+create table client
+(
+    shop_id      serial
+        primary key,
+    owner_id     integer      not null
+        unique
+        references manager_user
+            on delete restrict,
+    shop_name    varchar(100) not null
+        unique,
+    phone_number text,
+    email        text
+)
+    using ???;
+
+alter table client
+    owner to root;
+
