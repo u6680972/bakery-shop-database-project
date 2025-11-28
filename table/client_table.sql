@@ -9,10 +9,10 @@ create table client
     shop_name    varchar(100) not null
         unique,
     phone_number text,
-    email        text
+    email        text,
+    address      text
 )
     using ???;
 
 alter table client
     owner to root;
-
