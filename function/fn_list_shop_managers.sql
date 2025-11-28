@@ -9,9 +9,9 @@ BEGIN
             u.user_id,
             u.username,
             (u.first_name || ' ' || u.last_name) AS full_name
-        FROM "user" u
+        FROM manager_user u
                  JOIN shop_manager_access sma ON u.user_id = sma.manager_user_id
-        WHERE sma.shop_id = p_shop_id -- CRITICAL: Tenant Isolation
+        WHERE sma.shop_id = p_shop_id
         ORDER BY u.last_name, u.first_name;
 END;
 $$;
