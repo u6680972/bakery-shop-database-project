@@ -1,55 +1,54 @@
-CREATE OR REPLACE FUNCTION fn_login_unified(
-    p_username_or_email TEXT,
-    p_password TEXT,
-    p_shop_identifier TEXT
-)
-    RETURNS TABLE (
-      auth_id INT,
-      user_type TEXT,
-      shop_id INT,
-      first_name TEXT
-  )
-    LANGUAGE plpgsql
-AS $$
+create function fn_customer_register(p_shop_identifier text, p_email text, p_password text, p_first_name text, p_last_name text, p_phone_number text, p_address text DEFAULT NULL::text, p_city text DEFAULT NULL::text, p_zip_code text DEFAULT NULL::text) returns integer
+    language plpgsql
+as
+$$
 DECLARE
-    v_target_shop_id INT;
+    v_shop_id INT;
+    v_new_customer_id INT;
 BEGIN
-    SELECT client.shop_id INTO v_target_shop_id
+    -- 1. Get the shop ID based on the identifier
+    SELECT shop_id INTO v_shop_id
     FROM client
     WHERE shop_name = p_shop_identifier
     LIMIT 1;
 
-    RETURN QUERY
-        SELECT
-            mu.user_id AS auth_id,
-            'manager'::TEXT AS user_type,
-            sma.shop_id,
-            mu.first_name::TEXT
-        FROM manager_user mu
-                 JOIN shop_manager_access sma ON mu.user_id = sma.manager_user_id
-        WHERE (mu.username = p_username_or_email OR mu.email = p_username_or_email)
-          AND mu.password_hash = p_password
-          AND sma.shop_id = v_target_shop_id
-        LIMIT 1;
-
-    IF FOUND THEN
-        RETURN;
+    IF v_shop_id IS NULL THEN
+        RAISE EXCEPTION 'Shop not found: %', p_shop_identifier;
     END IF;
 
-    RETURN QUERY
-        SELECT
-            cu.customer_id AS auth_id,
-            'customer'::TEXT AS user_type,
-            cu.shop_id,
-            cu.first_name::TEXT
-        FROM customer_user cu
-        WHERE cu.email = p_username_or_email
-          AND cu.password_hash = p_password
-          AND cu.shop_id = v_target_shop_id
-        LIMIT 1;
+    -- 2. Create the customer record (Password is now ENCRYPTED)
+    INSERT INTO customer_user (
+        shop_id,
+        first_name,
+        last_name,
+        email,
+        password_hash,
+        phone_number,
+        address,
+        city,
+        zip_code
+    )
+    VALUES (
+               v_shop_id,
+               p_first_name,
+               p_last_name,
+               p_email,
+               crypt(p_password, gen_salt('bf')), -- <--- ENCRYPTION HERE
+               p_phone_number,
+               p_address,
+               p_city,
+               p_zip_code
+           )
+    RETURNING customer_id INTO v_new_customer_id;
 
-    RETURN;
+    RETURN v_new_customer_id;
+
+EXCEPTION
+    WHEN unique_violation THEN
+        RAISE EXCEPTION 'Registration failed: An account with this email already exists for this shop.';
 END;
 $$;
 
-ALTER FUNCTION fn_login_unified(text, text, text) OWNER TO root;
+alter function fn_customer_register(text, text, text, text, text, text, text, text, text) owner to root;
+
+
