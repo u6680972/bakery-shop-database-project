@@ -1,14 +1,21 @@
 create table "order"
 (
-    order_id     serial
+    order_id       serial
         primary key,
-    shop_id      integer not null
+    shop_id        integer not null
         constraint fk_orders_shop
             references client,
-    customer_id  integer,
-    total_amount numeric(10, 2),
-    status       text                     default 'pending'::text,
-    created_at   timestamp with time zone default CURRENT_TIMESTAMP
+    customer_id    integer,
+    total_amount   numeric(10, 2),
+    status         text                     default 'pending'::text
+        constraint chk_orders_status
+            check (status = ANY
+                   (ARRAY ['Awaiting Quote'::text, 'Awaiting Confirmation'::text, 'Confirmed'::text, 'In Process'::text, 'Finished'::text, 'Cancelled'::text])),
+    created_at     timestamp with time zone default CURRENT_TIMESTAMP,
+    deadline       timestamp with time zone,
+    deposit_amount numeric(10, 2)           default 0.00,
+    deposit_status text                     default 'Pending'::text,
+    notes          text
 )
     using ???;
 
