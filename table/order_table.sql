@@ -10,7 +10,7 @@ create table "order"
     status             text                     default 'pending'::text
         constraint chk_orders_status
             check (status = ANY
-                   (ARRAY ['Awaiting Quote'::text, 'Awaiting Confirmation'::text, 'Confirmed'::text, 'In Process'::text, 'Finished'::text, 'Cancelled'::text])),
+                   (ARRAY ['Awaiting Quote'::text, 'Awaiting Payment'::text, 'Awaiting Confirmation'::text, 'Confirmed'::text, 'In Process'::text, 'Ready for Pickup'::text, 'Ready for Delivery'::text, 'Finished'::text, 'Cancelled'::text])),
     created_at         timestamp with time zone default CURRENT_TIMESTAMP,
     deadline           timestamp with time zone,
     deposit_amount     numeric(10, 2)           default 0.00,
@@ -19,7 +19,8 @@ create table "order"
     fulfillment_method text
         constraint order_fulfillment_method_check
             check (fulfillment_method = ANY (ARRAY ['Pick Up'::text, 'Delivery'::text])),
-    delivery_address   text
+    delivery_address   text,
+    payment_slip_url   text
 )
     using ???;
 
